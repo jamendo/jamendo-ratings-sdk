@@ -1,0 +1,42 @@
+from sys import path
+path.append('../core')
+
+from JamendoPlotFuncs import defaultPlotting
+from JamendoCsvReader import JamendoCsvReader
+from JamendoStatAnalyser import JamendoStatAnalyser
+import matplotlib.pyplot as plt
+import numpy as np
+from utils import filterunder, filteroutofinterval #sorting functions
+
+
+#EXAMPLES OF USING JamendoPlotFuncs.defaultPlotting
+# this method refer to the dictionary defined in JamendoPlotFuncs. You can change the deault parameters defaultPlotting uses, 
+#simply overwriting them 
+
+
+
+
+JCR = JamendoCsvReader('stats_album_total.csv')
+
+defaultPlotting(JCR, 'downloads_all', filterunder(10000), title='items with more than 10000 downloads, with log(y)', \
+                    xlabel='items sorted by number of downloads', semilog=False, show=False) 
+
+
+
+#calulate playlisted mean, and the plot filtering values under this mean
+JSA = JamendoStatAnalyser(JCR)
+mean = JSA.funcOnColumn('playlisted', np.mean)
+std = JSA.funcOnColumn('playlisted', np.std)
+defaultPlotting(JCR, 'playlisted', filterunder(mean), show=False)
+
+
+defaultPlotting(JCR, 'playlisted', filteroutofinterval(mean-std, mean+std), \
+                title='items playlisted a num of time within the standard deviation range', show=True)
+
+
+
+#when you call defaultPlotting (and the same is for compareJoinedColumnsPlotting) with the keyarg show=False 
+# (needed for more then one plot per time), you have to call matplotlib.pyplot.show() at the end of your code or 
+# simply leave the last plot with show=True (that is the default) 
+
+
