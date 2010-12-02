@@ -9,6 +9,10 @@ REQUIREMENTS
 This code has been developed with: python 2.6.6, numpy 1.5.1rc2, matplotlib 0.99.1.1
 Many times python releases include numpy, but not matplotlib. To use the graphs API of this SDK you need to install matplotlib. Anyway, you can use the classes JamendoCsvReader and JamendoStatAnalyser without it and this allow you to make simple operation as, the most important, write and test your algo without plotting; to do this, simply call from your command line test_algo.py with 0 as last parameter (this put the parameter plot=False). More about test_algo.py in the following paragraphs. 
 
+Before executing remember to unzip all files in https://github.com/jamendo/jamendo-ratings-sdk/tree/master/CSV/ 
+
+
+
 
 
 THE PACKAGE
