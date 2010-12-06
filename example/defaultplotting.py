@@ -29,14 +29,10 @@ mean = JSA.funcOnColumn('playlisted', np.mean)
 std = JSA.funcOnColumn('playlisted', np.std)
 defaultPlotting(JCR, 'playlisted', filterunder(mean), show=False)
 
-
 defaultPlotting(JCR, 'playlisted', filteroutofinterval(mean-std, mean+std), \
                 title='items playlisted a num of time within the standard deviation range', show=True)
 
 
 
-#when you call defaultPlotting (and the same is for compareJoinedColumnsPlotting) with the keyarg show=False 
-# (needed for more then one plot per time), you have to call matplotlib.pyplot.show() at the end of your code or 
-# simply leave the last plot with show=True (that is the default) 
 
 

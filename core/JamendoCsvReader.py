@@ -89,7 +89,7 @@ class JamendoCsvReader(object):
         
         if type=='default': 
             try: type=DefaulPlotDict[colname]['type']
-            except: raise Exception('%s is not in the default fields. you should insert the type of %s as a key arg (e.g. type=float)' % (colname, colname))
+            except: type=float
                     
         if reverse is None:
             a = self.iterColumnValues(colname, filterfunc)
