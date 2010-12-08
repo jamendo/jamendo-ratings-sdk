@@ -1,8 +1,9 @@
 
 ************************************************
-********** JAMENDO OPEN SPURCE RATING **********
+********** JAMENDO OPEN SOURCE RATING **********
 ************************************************
 
+PARTECIPATE TO THE PROJECT ON: http://www.jamendo.com/en/group/opensourceratings
 
 
 REQUIREMENTS
@@ -39,6 +40,8 @@ this is the directory tree of the package
 	- histogram.py
 	- plot_rating_stats.py
 	- using_StatisticAnalyser.py
+	- reviewsAVGs.py
+	- reviewsAVGs_computation.py
 - CSV
 	- stats_album_month.csv
 	- ...
@@ -92,3 +95,7 @@ Used by test_algo.py to write the new csv. By the way, you can use it manually t
 test_algo.py takes from this directory the file, with its relative function, to execute. This files and function in, must respect the template explained in the file _TEMPLATE_.py. 
 By the way you may obviously modify this template changing the way test_algo.py works.
 
+
+** CSV directory **
+Contains all the csv datasets used. Nine of them concern artsit or album or track statistics, calculated on the period of 1 week or 1 month or on the total history we have (about 2 year and half). Each field is descripted in the file core. defaultplotdict.py
+stats_reviewAVGs.csv is an apart file where you can find the dump of different way to calculate reviews' vote average. reviewAVGs_computation show how they are calculated and example.reviewAVGs.py compare them. More information, comments and discussiouns about this topic at: http://www.jamendo.com/en/group/opensourceratings/forum/discussion/549/jamendo-rating-sdk-published#Item_2 
