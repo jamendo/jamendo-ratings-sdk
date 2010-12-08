@@ -8,7 +8,7 @@ def setColumnDict(type=float, title='', x='', y='', semilog=True, reverse=True):
 
 #SOME OF THIS FIELD ARE NOT EXPLICITLY EXPLAINED AS UNIQUE, BUT THEY ARE SO (e.f downloads_all are counted from unique IPs)! 
 DefaulPlotDict = {\
-                   "rating": setColumnDict(float, semilog=False, title='rating calculated with the old formula', y='rating calculated with the old formula', x=''), \
+                   "rating": setColumnDict(float, semilog=False, title='rating calculated with the old formula', y='rating calculated with the old formula'), \
                    "reviews_avgnote": setColumnDict(float, semilog=False, y='reviews average note', x=''), \
                    "reviews_avgweightednote": setColumnDict(float, title='review avg weighted note', y='reviews avg note (every agree on a review is counted as a new note)', x=''),\
                    "widgetplayed": setColumnDict(int, title='cumulative number of plays of the widget'),\
@@ -16,11 +16,10 @@ DefaulPlotDict = {\
                    "widgetused": setColumnDict(int, title='number of times the widget was actually used (=had at least 1 play)'),\
                    "widgetuniques": setColumnDict(int, title='number of unique IPs that displayed the widget'),\
                    "widgeters_logged": setColumnDict(int, title='number of times the widgets of each artist were actually used'),\
-                   "downloads_all": setColumnDict(int, y='downloads number', x='items sorted by decreasing download number'),\
+                   "downloads_all": setColumnDict(int, y='number of both anonymous and logged downloads'),\
                    "downloaders_logged": setColumnDict(int, title='number of downloads for each artist'),\
-                   "listened_anon": setColumnDict(int, y='number of anonin listening', x='items sorted by decreasing number of listening '),\
-                   "listened_logged": setColumnDict(int, y='number of logged listening', x='items sorted by decreasing number of listening'),\
-                   "listeners_logged": setColumnDict(int, title='number of listening for each artist'),\
+                   "listened_all": setColumnDict(int, y='number of both anonymous and logged listenings (unique IP)'),\
+                   "listeners": setColumnDict(int, title='number of listening for each artist (both logged and anon, but unique IP)'),\
                    "reviews_all": setColumnDict(int, title='number of reviews with or without text'),\
                    "reviews_txt": setColumnDict(int, title='number of reviews with text'),\
                    "reviewers_logged": setColumnDict(int, title='number of reviews for each artist'),\
