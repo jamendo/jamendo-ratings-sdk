@@ -10,7 +10,8 @@ def setColumnDict(type=float, title='', x='', y='', semilog=True, reverse=True):
 DefaulPlotDict = {\
                    "rating": setColumnDict(float, semilog=False, title='rating calculated with the old formula', y='rating calculated with the old formula'), \
                    "reviews_avgnote": setColumnDict(float, semilog=False, y='reviews average note', x=''), \
-                   "reviews_avgweightednote": setColumnDict(float, title='review avg weighted note', y='reviews avg note (every agree on a review is counted as a new note)', x=''),\
+                   "avg_agreed_note": setColumnDict(float, title='review average note that consider also the agreement on reviews', y='avg note (every agree on a review is counted as a new note)', x=''),\
+                   "weighted_avg_agreed_note": setColumnDict(float, title='avg that consider lower votes (<4) as more important (weight of 1.5) and\n consider agreements on each review', y='avg weighted note', x=''),\
                    "widgetplayed": setColumnDict(int, title='cumulative number of plays of the widget'),\
                    "widgetviewed": setColumnDict(int, title='cumulative number of times the widget was displayed'),\
                    "widgetused": setColumnDict(int, title='number of times the widget was actually used (=had at least 1 play)'),\
