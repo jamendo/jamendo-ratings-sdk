@@ -1,3 +1,6 @@
+#########################################################
+# THIS IS HOW stats_reviewsAVGs.csv VALUES ARE COMPUTED #
+#########################################################
 
 #EXAMPLE: HOW IT WORKS ON ALBUM XXX (agree_cnt count the agreements + 1 that is the review's author)
 #SELECT notes, agree_cnt

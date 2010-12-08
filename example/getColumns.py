@@ -23,16 +23,16 @@ plt.title('FB total (sum of likes,comments and shares)')
 
 
 #COMPARE CURVE WITHOUT USING compareJoinedColumnsPlotting (you have more freedom to directly set any parameters...)
-JC = JCR.getColumns(['reviews_avgnote', 'reviews_avgweightednote'], sortkey='reviews_avgnote')
+JC = JCR.getColumns(['reviews_avgnote', 'avg_agreed_note'], sortkey='reviews_avgnote')
 
-avgweightednote = JC['reviews_avgweightednote']
+avgweightednote = JC['avg_agreed_note']
 avgnote = JC['reviews_avgnote']
 
 plt.figure()
 plt.plot(avgweightednote, 'g-')
 plt.plot(avgnote, 'r-', linewidth=2)
 
-plt.legend(['reviews_avgweightednote', 'reviews_avgnote'], loc='best')
+plt.legend(['avg_agreed_note', 'reviews_avgnote'], loc='best')
 
 plt.show()
 
