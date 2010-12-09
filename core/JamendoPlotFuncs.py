@@ -2,6 +2,7 @@ from numpy import fromiter, array, ones
 from numpy import amin, amax, nanmax, nanmin, ptp, average, mean, median, std, var
 import matplotlib.pyplot as plt
 from JamendoCsvReader import * 
+from utils import filterunder
 from defaultplotdict import DefaulPlotDict
 from itertools import starmap
 from JamendoStatAnalyser import JamendoStatAnalyser
@@ -44,7 +45,7 @@ def compareJCRColumns(JamendoCsvReader, fields, sortkey=None, filterfunc=lambda 
         i+=1
            
     plt.plot(*args)
-    #plt.plot(array(JC['listened_anon']), 'r-', array(JC['listened_logged']), 'b-', ....
+    #plt.plot(array(JC['listened_all']), 'r-', array(JC['downloads_all']), 'b-', ....
 
     if title=='default': plt.title('Compare : '+ ','.join(fields) + ' (log(x) )' if semilog else '', fontsize=10 )
     else: plt.title(title)
@@ -57,11 +58,13 @@ def compareJCRColumns(JamendoCsvReader, fields, sortkey=None, filterfunc=lambda 
 
 
 #****** FUNCTION FOR PLOT GRAPHS RELATED TO ONE JamendoCsvReader******
-def plot_rating_stats(JamendoCsvReader, field='rating', type=float, title='', show=True):
+def plot_rating_stats(JamendoCsvReader, field='rating', type=float, title='', show=True, nozero=False):
     """This function is thought to be used for plotting rating statistical informations and graphs, 
     but may b used with other fields..."""
     
-    rating = JamendoCsvReader.getColumnArray(field, reverse=True, type=type)        
+    f = lambda x: x != 0 if nozero else lambda x:True
+    
+    rating = JamendoCsvReader.getColumnArray(field, reverse=True, type=type, filterfunc=f)   
         
     JSA = JamendoStatAnalyser(JamendoCsvReader)
     columnmean = JSA.funcOnColumn(field, mean)
