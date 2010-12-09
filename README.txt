@@ -3,7 +3,7 @@
 ********** JAMENDO OPEN SOURCE RATING **********
 ************************************************
 
-PARTECIPATE TO THE PROJECT ON: http://www.jamendo.com/en/group/opensourceratings
+PARTECIPATE IN THE PROJECT! http://www.jamendo.com/en/group/opensourceratings
 
 
 REQUIREMENTS
@@ -31,6 +31,7 @@ this is the directory tree of the package
 	- _TEMPLATE_.py
 	- frankharper.py
 	- albumtrackmean.py
+	- bayes_weighted_avg.py
 - example
 	- compareJCRColumns.py
 	- comparePeriodsOf1Unit.py
@@ -60,6 +61,7 @@ python test_algo.py xxx stats_album_total.csv name_of_the_new_file_to_create.csv
 Doing so, you apply the xxx algorithm on the stats_album_total.csv data (that might call other related data: see JamendoCsvReader), creating a file name_of_the_new_file_to_create.csv, that is a copy of stats_album_total.csv with a new column (named by default as 'NEWrating', but you can change it easliy editing the file test_algo.py) with the new calculated rates.
 Your xxx algorithm might yield not normalize values (or values not in the 0-1 range). test_algo.py by default provide a normalization on received iterator values. Change the parameter "normalize" if, for your test, you don't want to apply this functionality (but remember that Jamendo need normalized values!).
 test_algo.py has a 4th optional boolean argument, set as 1 by default. If you leave it as 1, after the csv creation process, in your screen will appear the statistical informations and graphs about the old rates and your new calculated rates. If you can't or don't want to use matplotlib, call test_algo.py writing 0 as the 4th argument.
+Another feature of this module is to print charts. By default after execution of test_algo(), you'll be provided with the print of the first 15 positions calculated on the old and the new ratig parameter.
 Your algorithms have to be put in rating_algo directory respecting the recommendations explained in rating_algo section of this file. 
 
 
@@ -91,8 +93,8 @@ Contains useful sorting functions
 Used by test_algo.py to write the new csv. By the way, you can use it manually to create a new csv, copying an old one, but adding a new column.
 
 
-** rating_algo **
-test_algo.py takes from this directory the file, with its relative function, to execute. This files and function in, must respect the template explained in the file _TEMPLATE_.py. 
+** rating_algo directory**
+test_algo.py takes from this directory the file, with its relative function, to execute. These files and functions, must respect the template explained in the file _TEMPLATE_.py. 
 By the way you may obviously modify this template changing the way test_algo.py works.
 
 
