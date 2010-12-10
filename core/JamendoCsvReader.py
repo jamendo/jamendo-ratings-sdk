@@ -17,49 +17,44 @@ class JamendoCsvReader(object):
         
         self.file = file
                 
+        #album track or artist?
         for key in filesdict.keys():
             if file in filesdict[key]: self.unit = key
                     
-        self._row_dict_cache=dict()
-        
-        self.cached=False
-        try: file = self.colnames = csv.reader(open('CSV/'+self.file), delimiter=';', quotechar='"').next()
-        except: 
-            try: file = self.colnames = csv.reader(open('../CSV/'+self.file), delimiter=';', quotechar='"').next()
-            except Exception, e: raise e
-             
-              
-    def iterRow(self):
-        """Iter on all rows. Each row is in the form of a dict {field1:this_row_val_of_field1, field2:this_row_val_of_field2, ...}.
-        The first time is called, caches rows in a dict, indexing them by id. in the following, yield value using this cache"""
-         
-        if not self.cached:
-            row_dict=dict()
-            
-            try: file = open('CSV/'+self.file)
-            except: 
-                try: file = open('../CSV/'+self.file)
-                except Exception, e: raise e
-            
-            csvreader = csv.DictReader(file, delimiter=';', quotechar='"')     
-    
-            for row in csvreader:  
-                for k_v in row.items():
-                    try: 
-                        row[k_v[0]]=float(k_v[1])                    
-                    except ValueError: 
-                        pass #k_v[1] is a string   
-                row_dict[row['id']]=row
-                       
-                yield row 
                     
-            self._row_dict_cache = row_dict
-            self.cached = True
-            file.close()
+        #take the file
+        try: csvreader = csv.DictReader(open('CSV/'+self.file), delimiter=';', quotechar='"')
+        except: 
+            try: csvreader = csv.DictReader(open('../CSV/'+self.file), delimiter=';', quotechar='"')
+            except Exception, e: raise e
             
-        else:
-            for element in self._row_dict_cache.values():
-                yield element
+        self.colnames = False       
+        
+        #load data in the a cahe dictionary indexed on IDs
+        self._row_dict_cache=dict()
+        a = 0             
+        for row in csvreader:
+            a+=1  
+            #in the first iteration columns store the columns name
+            if not self.colnames: self.colnames = row.keys()  
+            for key,val in row.items():
+                #casting of the values on this row
+                try: 
+                    row[key]=float(val)                    
+                except ValueError: 
+                    #print 'pppp'
+                    pass #this val is a string
+                
+            #if self._row_dict_cache.has_key(row['id']): raise Exception('duplicated key: '+ str(row['id']))   
+            self._row_dict_cache[row['id']]=row             
+            
+            
+    def iterRow(self):
+        """Iter on all rows. Each row is in the form of a dict {field1:this_row_val_of_field1, field2:this_row_val_of_field2, ...} and is indexed in a cache
+        (self._row_dict_cache) by id. iterRow, yield value using this cache.values()"""
+         
+        for element in self._row_dict_cache.values():
+            yield element
 
 
     def iterRowSelectingColumns(self, colnames, filterfunc=lambda y:True): 
@@ -73,8 +68,8 @@ class JamendoCsvReader(object):
                 #...                                              
     
     def iterColumnValues(self, colname, filterfunc=lambda y:True):
-        """Iter yielding values belonged to a given column (the one with the name colname), 
-        eventually filtering it (see core.utils)"""
+        """Iter yielding values belonged to a given column (the one with the name colname), eventually filtering 
+        it (see core.utils). Return only the values, not value with key as iterRow and iterRowSelectingColumns"""
         
         if colname not in self.colnames: raise KeyError('colname '+str(colname)+' is not a valid column name. choose from '+str(self.colnames))
 
