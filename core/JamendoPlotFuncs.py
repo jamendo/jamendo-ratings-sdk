@@ -29,8 +29,15 @@ def defaultPlotting(JamendoCsvReader, colname, filterfunc=lambda y:True, title=N
     if show: plt.show()
 
 
+def nomramlizeTo0_1(col):
+    
+    m, M = min(col), max(col)    
+    normalizedcol = [(v-m)/float((M-m)) for v in col]    
+    
+    return normalizedcol
+
 #****** FUNCTION FOR PLOT GRAPHS RELATED TO ONE JamendoCsvReader******
-def compareJCRColumns(JamendoCsvReader, fields, sortkey=None, filterfunc=lambda x:True, reverse=True, semilog=False,\
+def compareJCRColumns(JamendoCsvReader, fields, sortkey=None, filterfunc=lambda x:True, normalize=False, reverse=True, semilog=False,\
             plotlines = ['b-','g-','r-', 'c-', 'm-', 'y-', 'k-'], title='default', show=True):
     
     plt.figure()
@@ -40,7 +47,7 @@ def compareJCRColumns(JamendoCsvReader, fields, sortkey=None, filterfunc=lambda 
     args = list()
     i=0
     for field in fields:
-        args.append(JC[field])
+        args.append(nomramlizeTo0_1(JC[field])) if normalize else args.append(JC[field])
         args.append(plotlines[i])
         i+=1
            
@@ -84,7 +91,7 @@ def plot_rating_stats(JamendoCsvReader, field='rating', type=float, title='', sh
     plt.title(title)
     
     plt.subplot(212)
-    plt.hist(rating, bins=100, range=(0,1))
+    plt.hist(rating, bins=100, range=(min(rating),max(rating)))
     plt.legend(('rating distribution (100 bins)',), loc=0)  
     if show: plt.show()
         
