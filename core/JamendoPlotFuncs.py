@@ -40,6 +40,8 @@ def nomramlizeTo0_1(col):
 def compareJCRColumns(JamendoCsvReader, fields, sortkey=None, filterfunc=lambda x:True, normalize=False, reverse=True, semilog=False,\
             plotlines = ['b-','g-','r-', 'c-', 'm-', 'y-', 'k-'], title='default', show=True):
     
+    if len(fields)<2: raise Exception('joinColumns need at least 2 columns as an argument')
+    
     plt.figure()
         
     JC = JamendoCsvReader.getColumns(fields, sortkey=sortkey, filterfunc=filterfunc, reverse=reverse)

@@ -98,8 +98,6 @@ class JamendoCsvReader(object):
         dictofcolumns by its column name). Every list, even if sorted and/or filtered, will be aligned to the others.\n
         You can also get an iter or array return type simply using the key arg castreturntype (set it with the desidered cast function)...\n
         For filterfunc key arg, see utils.filterfieldsunder """
-        
-        if len(colnames)<2: raise Exception('joinColumns need at least 2 columns as an argument')
            
         if sortkey is None: selectedcolumnsiter = self.iterRowSelectingColumns(colnames, filterfunc)
         else: selectedcolumnsiter = sorted(self.iterRowSelectingColumns(colnames, filterfunc), key=lambda x:x[sortkey], reverse=reverse)

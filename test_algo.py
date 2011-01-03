@@ -43,7 +43,7 @@ def test_algo(algo, originalfile, newfile, plot=1):
     normalize = True
     oldfield = 'rating'
     newfield = 'NEWrating'  
-    chartN = 15
+    chartN = 20
     nozero = True
     
       
@@ -68,13 +68,13 @@ def test_algo(algo, originalfile, newfile, plot=1):
     printChart(JCR, chartN, newfield, oldfield )
     
 
-    if plot:
+    if int(plot):
         
         plot_rating_stats(JCR, oldfield, title=oldfield, show=False, nozero=nozero)
         plot_rating_stats(JCR, newfield, title=newfield, show=False, nozero=nozero)
 
-        compareJCRColumns(JCR, [newfield, oldfield], sortkey=newfield, \
-                          title='comparare %s and %s (values aligned by same ids)' % (newfield, oldfield))
+        compareJCRColumns(JCR, [oldfield, 'weighted_avg_agreed_note', newfield], sortkey=newfield, \
+                          title='comparare %s and %s (values aligned by same ids)' % (oldfield, newfield))
                
 
 test_algo(*argv[1:])
