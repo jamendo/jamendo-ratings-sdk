@@ -20,7 +20,7 @@ compareJCRColumns(JCR, ["widgetplayed","widgetviewed","widgetused","widgetunique
 
 
 #FIELDS COMPARING, SORTING BY AGE 
-p = ["days","shared", "playlisted","downloads_all","listened_all","reviews_all"]
+p = ["days","shared", "playlisted","downloads_all","listened_logged","reviews_all"]
 compareJCRColumns(JCR, p, sortkey="days", semilog=True, plotlines=['y--','b-','g-','r-','c-','m-'], \
                   show=False, title='compare fields on album sorted by age (from the oldest to the youngest)')
 
@@ -32,6 +32,5 @@ compareJCRColumns(JamendoCsvReader('stats_artist_total.csv'), ["playlisters_logg
 
 
 #YOU CAN ALSO MAKE A COMPARE DIRECTLY USING THE METHODS JamendoCsvReader.getJoinedColumnm or JamendoPotFuncs.getColumnsJoinOnPeriods... 
-
 
 

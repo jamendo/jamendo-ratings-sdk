@@ -56,7 +56,7 @@ def bayesian_weighted_avg(file, period='', istest=False):
                                                                           for interval in range(0, maxday, time_slot)]
     
       
-    rows = JCR.iterRowSelectingColumns(['weighted_avg_agreed_note', 'reviews_all', 'id', 'days', 'listened_all'])
+    rows = JCR.iterRowSelectingColumns(['weighted_avg_agreed_note', 'reviews_all', 'id', 'days', 'listened_logged', 'listened_anon'])
     for row in rows:
                            
         if period=='total': 
@@ -66,7 +66,7 @@ def bayesian_weighted_avg(file, period='', istest=False):
             avg_deviation_bonus = avg_deviation_by_period[timeslotindex] / 3.  
         else: avg_deviation_bonus = 0
         
-        if row['reviews_all']>=reviews_all_threshold and row['listened_all']>=listened_all_threshold:
+        if row['reviews_all']>=reviews_all_threshold and (row['listened_logged'] + row['listened_anon']) >= listened_all_threshold:
             coef = float(row['reviews_all']) / (row['reviews_all'] + bayes_constant)        
             bayesian_estimate = coef * (row['weighted_avg_agreed_note'] + avg_deviation_bonus) + (1-coef) * reviewsavg
                                     

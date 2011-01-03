@@ -42,7 +42,6 @@ class JamendoCsvReader(object):
                 try: 
                     row[key]=float(val)                    
                 except ValueError: 
-                    #print 'pppp'
                     pass #this val is a string
                 
             #if self._row_dict_cache.has_key(row['id']): raise Exception('duplicated key: '+ str(row['id']))   

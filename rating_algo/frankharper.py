@@ -21,7 +21,7 @@ def frankharper(file):
             numoftracks += 1
             trackdownloads += track['downloads_all']
             trackplaylisted += track['playlisted'] 
-            tracklistened += track['listened_all'] 
+            tracklistened += track['listened_anon'] 
 
 
         if numoftracks>0:              

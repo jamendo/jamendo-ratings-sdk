@@ -54,7 +54,7 @@ def compareJCRColumns(JamendoCsvReader, fields, sortkey=None, filterfunc=lambda 
         i+=1
            
     plt.plot(*args)
-    #plt.plot(array(JC['listened_all']), 'r-', array(JC['downloads_all']), 'b-', ....
+    #plt.plot(array(JC['listened_logged']), 'r-', array(JC['downloads_all']), 'b-', ....
 
     if title=='default': plt.title('Compare : '+ ','.join(fields) + ' (log(x) )' if semilog else '', fontsize=10 )
     else: plt.title(title)
