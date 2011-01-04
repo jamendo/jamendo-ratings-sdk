@@ -30,16 +30,16 @@ def bayesian_weighted_avg(file, period='', istest=False):
     if period=='total': 
         bayes_constant = 7
         reviews_all_threshold = 10 
-        listened_all_threshold = 1000 
+        listened_threshold = 200 
     elif period=='month':
         bayes_constant = 6 
         reviews_all_threshold = 4
-        listened_all_threshold = 200
+        listened_threshold = 100
     #too few reviews! Do we have to consider week-review chart? It should go to increase user activity, but with the current per-week review quantity is not considerable
     elif period=='week': 
         bayes_constant = 5 
         reviews_all_threshold = 3
-        listened_all_threshold = 150        
+        listened_threshold = 50        
 
         
     
@@ -56,7 +56,7 @@ def bayesian_weighted_avg(file, period='', istest=False):
                                                                           for interval in range(0, maxday, time_slot)]
     
       
-    rows = JCR.iterRowSelectingColumns(['weighted_avg_agreed_note', 'reviews_all', 'id', 'days', 'listened_logged', 'listened_anon'])
+    rows = JCR.iterRowSelectingColumns(['weighted_avg_agreed_note', 'reviews_all', 'id', 'days', 'listened_logged'])
     for row in rows:
                            
         if period=='total': 
@@ -66,7 +66,7 @@ def bayesian_weighted_avg(file, period='', istest=False):
             avg_deviation_bonus = avg_deviation_by_period[timeslotindex] / 3.  
         else: avg_deviation_bonus = 0
         
-        if row['reviews_all']>=reviews_all_threshold and (row['listened_logged'] + row['listened_anon']) >= listened_all_threshold:
+        if row['reviews_all']>=reviews_all_threshold and (row['listened_logged']) >= listened_threshold:
             coef = float(row['reviews_all']) / (row['reviews_all'] + bayes_constant)        
             bayesian_estimate = coef * (row['weighted_avg_agreed_note'] + avg_deviation_bonus) + (1-coef) * reviewsavg
                                     
