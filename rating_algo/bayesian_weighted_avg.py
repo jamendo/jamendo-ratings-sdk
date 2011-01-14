@@ -56,13 +56,15 @@ def bayesian_weighted_avg(file, period='', istest=False):
       
     rows = JCR.iterRowSelectingColumns(['weighted_avg_agreed_note', 'reviews_all', 'id', 'days', 'listened_logged'])
     for row in rows:
-                           
+
+        avg_deviation_bonus = 0                           
         if period=='total': 
             timeslotindex = len(range(0, int(row['days'])+1, time_slot))-1 #index of time slot this album belong
             #get the avg deviation for this album. avg deviation is the difference between global avg and the avg of this time slot. 
             # / 2 because this bonus is just an adjustment and can't be considered completely reliable and fair
             avg_deviation_bonus = avg_deviation_by_period[timeslotindex] / 2. 
-        else: avg_deviation_bonus = 0
+
+        
         
         coef = float(row['reviews_all']) / (row['reviews_all'] + bayes_constant)
         bayesian_estimate = coef * (row['weighted_avg_agreed_note'] + avg_deviation_bonus) + (1-coef) * reviewsavg
