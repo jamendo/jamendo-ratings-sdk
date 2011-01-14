@@ -28,23 +28,21 @@ def bayesian_weighted_avg(file, period='', istest=False):
     
     #CONSTANTS
     if period=='total': 
-        bayes_constant = 7
-        reviews_all_threshold = 10 
-        listened_threshold = 200 
+        bayes_constant = 20
+        reviews_all_2decrease = 20 
     elif period=='month':
         bayes_constant = 6 
-        reviews_all_threshold = 4
-        listened_threshold = 100
+        reviews_all_2decrease = 4
     #too few reviews! Do we have to consider week-review chart? It should go to increase user activity, but with the current per-week review quantity is not considerable
     elif period=='week': 
         bayes_constant = 5 
-        reviews_all_threshold = 3
-        listened_threshold = 50        
-
+        reviews_all_2decrease = 3        
+    
+    decrease_ind = 0.2
         
     
         
-    reviewsavg = np.average(JCR.getColumnArray('weighted_avg_agreed_note'))  
+    reviewsavg = np.average(JCR.getColumns(['weighted_avg_agreed_note'], filterfunc=lambda x:x['reviews_all']>0)['weighted_avg_agreed_note'])  
     if period=='total':
         maxday = max(JCR.getColumnArray('days'))
         time_slot = int((maxday/10.)+1)
@@ -62,17 +60,17 @@ def bayesian_weighted_avg(file, period='', istest=False):
         if period=='total': 
             timeslotindex = len(range(0, int(row['days'])+1, time_slot))-1 #index of time slot this album belong
             #get the avg deviation for this album. avg deviation is the difference between global avg and the avg of this time slot. 
-            # / 3 because this bonus is just an adjustment and can't be considered completely reliable and fair
-            avg_deviation_bonus = avg_deviation_by_period[timeslotindex] / 3.  
+            # / 2 because this bonus is just an adjustment and can't be considered completely reliable and fair
+            avg_deviation_bonus = avg_deviation_by_period[timeslotindex] / 2. 
         else: avg_deviation_bonus = 0
         
-        if row['reviews_all']>=reviews_all_threshold and (row['listened_logged']) >= listened_threshold:
-            coef = float(row['reviews_all']) / (row['reviews_all'] + bayes_constant)        
-            bayesian_estimate = coef * (row['weighted_avg_agreed_note'] + avg_deviation_bonus) + (1-coef) * reviewsavg
-                                    
-        else: bayesian_estimate=0
-
-        
+        coef = float(row['reviews_all']) / (row['reviews_all'] + bayes_constant)
+        bayesian_estimate = coef * (row['weighted_avg_agreed_note'] + avg_deviation_bonus) + (1-coef) * reviewsavg
+        if 0 < row['reviews_all'] <= reviews_all_2decrease:          
+            decreaser = (1- decrease_ind) + (decrease_ind  * row['reviews_all'] / reviews_all_2decrease)          
+            bayesian_estimate *= decreaser
+        elif row['reviews_all']==0: bayesian_estimate=0
+            
         if istest: yield dict(row.items() + [['rate',bayesian_estimate]])
         else: yield bayesian_estimate        
 
@@ -82,7 +80,7 @@ def test(file, period=''):
     
     chart = sorted(bayesian_weighted_avg(file, period, True), key=lambda x:x['rate'], reverse=True)  
     
-    for i in range(0,30):
+    for i in range(0,80):
         print str(chart[i]['id'])+': '+str(['%s:%s' % (p[0],round(p[1],4)) for p in chart[i].items() if p[0] != 'id'])
         
     plt.figure()
@@ -103,5 +101,5 @@ def test(file, period=''):
     plt.show()
 
 
-#test('stats_album_total.csv')
+#test('stats_album_total.csv', 'total')
 
