@@ -44,8 +44,9 @@ class JamendoCsvReader(object):
                 except ValueError: 
                     pass #this val is a string
                 
-            #if self._row_dict_cache.has_key(row['id']): raise Exception('duplicated key: '+ str(row['id']))   
+            if self._row_dict_cache.has_key(row['id']): raise Exception('duplicated key: '+ str(row['id']))   
             self._row_dict_cache[row['id']]=row             
+
             
             
     def iterRow(self):
@@ -174,7 +175,7 @@ class JamendoCsvReader_artist(JamendoCsvReader):
         assert self.file in filesdict['artist'], '%s is not an available artist file! To add a new, change variables JamendoCsvReader.filesdict' % self.file
         
         self.relatedalbumfile = filesdict['album'][filesdict['artist'].index(self.file)]
-        self.RelatedAlbums = JamendoCsvReader_album( self.relatedalbumfile )
+        self.RelatedAlbums = JamendoCsvReader_album( self.relatedalbumfile, False )
       
       
         
@@ -182,16 +183,19 @@ class JamendoCsvReader_artist(JamendoCsvReader):
         
 class JamendoCsvReader_album(JamendoCsvReader):
 
-    def __init__(self, *args):
-        JamendoCsvReader.__init__(self, *args)
+    def __init__(self, file, relatedartists=True):
+        JamendoCsvReader.__init__(self, file)
         assert self.file in filesdict['album'], '%s is not an available album file! To add a new, change variables JamendoCsvReader.filesdict' % self.file
         
         self.relatedtrackfile = filesdict['track'][filesdict['album'].index(self.file)]
-        self.RelatedTracks = JamendoCsvReader_track( self.relatedtrackfile )
+        self.RelatedTracks = JamendoCsvReader_track( self.relatedtrackfile, False )
 
         self.artists_cached=False
         self._row_artistid_dict_cache = dict()
 
+        if relatedartists:
+            self.relatedartists = filesdict['album'][filesdict['track'].index(self.file)]
+            self.RelatedArtists = JamendoCsvReader( self.self.relatedartists )            
              
     def iterAlbumJoinArtist(self, artistid):
         
@@ -222,13 +226,17 @@ class JamendoCsvReader_album(JamendoCsvReader):
     
 class JamendoCsvReader_track(JamendoCsvReader):
     
-    def __init__(self, *args):
-        JamendoCsvReader.__init__(self, *args)
+    def __init__(self, file, relatedalbums=True):
+        JamendoCsvReader.__init__(self, file)
         assert self.file in filesdict['track'], '%s is not an available track file! To add a new, change variables JamendoCsvReader.filesdict' % self.file
         
         self.tracks_cached = False
         self._row_albumid_dict_cache = dict()
 
+        if relatedalbums: 
+            self.relatedalbums = filesdict['album'][filesdict['track'].index(self.file)]
+            self.RelatedAlbums = JamendoCsvReader( self.relatedalbums )
+            
              
     def iterTrackJoinAlbum(self, albumid):
         
