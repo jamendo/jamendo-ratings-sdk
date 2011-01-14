@@ -109,15 +109,15 @@ def computeEachParRate(JCR, period, istest):
                           
                             
     #PLAYLIST RATE
-    ratecolumns['pl'] = np.true_divide(columns['playlisted']*bouncer_for_avg, (1+album_listened)) #pure rate
-    pl_avg = np.average([pl for pl in ratecolumns['pl'] if pl>0])
+    ratecolumns['pl'] = np.true_divide(columns['playlisted'], (1+album_listened)) #pure rate
+    pl_avg = np.average([pl for pl in ratecolumns['pl']*bouncer_for_avg if pl>0])
     print 'pl_avg ' + str(pl_avg)
     ratecolumns['pl'] = (ratecolumns['coef'] * ratecolumns['pl'] + (1-ratecolumns['coef'])*pl_avg)*reducer #estimated rate
                   
                   
     #STARRED RATE                 
-    ratecolumns['st'] = np.true_divide(columns['starred']*bouncer_for_avg, (1+album_listened)) #pure rate
-    st_avg = np.average([st for st in ratecolumns['st'] if st>0])
+    ratecolumns['st'] = np.true_divide(columns['starred'], (1+album_listened)) #pure rate
+    st_avg = np.average([st for st in ratecolumns['st']*bouncer_for_avg if st>0])
     print 'st_avg ' + str(st_avg)
     ratecolumns['st'] = (ratecolumns['coef'] * ratecolumns['st'] + (1-ratecolumns['coef'])*st_avg)*reducer #estimated rate
 
@@ -132,7 +132,7 @@ def computeEachParRate(JCR, period, istest):
 
         
         
-def CommunityLikesRate(file, period='', istest=False):    
+def CommunityLikesRate(file, period='total', istest=False):    
     global default_constants
         
             
@@ -233,4 +233,4 @@ def test(file, period=''):
 
 
 #FOR TESTING WITHOUT WRITING ON A FILE
-#test('stats_album_total.csv')
+test('stats_album_total.csv', 'total')
