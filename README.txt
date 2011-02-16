@@ -102,6 +102,7 @@ Used by RateCalculator to write a new csv with the rate you can declare as shown
 ** rating_algo directory**
 RateCalculator takes from this directory the file, with its relative function, to execute. These files and functions, must respect the template 
 explained in the file _TEMPLATE_.py. 
+As you can see each rating algorithm is provided with a test function that allow to run, test and plots results indipendently.
 
 
 ** CSV directory **
