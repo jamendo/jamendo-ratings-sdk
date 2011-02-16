@@ -20,8 +20,8 @@ compareJCRColumns(JCR, ["widgetplayed","widgetviewed","widgetused","widgetunique
 
 
 #FIELDS COMPARING, SORTING BY AGE 
-p = ["days","shared", "playlisted","downloads_all","listened_logged","reviews_all"]
-compareJCRColumns(JCR, p, sortkey="days", semilog=True, plotlines=['y--','b-','g-','r-','c-','m-'], \
+p = ["days_since_publication","shared", "playlisted","downloads_all","listened_logged","reviews_all"]
+compareJCRColumns(JCR, p, sortkey="days_since_publication", semilog=True, plotlines=['y--','b-','g-','r-','c-','m-'], \
                   show=False, title='compare fields on album sorted by age (from the oldest to the youngest)')
 
 

@@ -25,9 +25,9 @@ The green one exclude items with review avg=0, so the ones that \n probably have
 
 
 
-avgnote = JCR.getColumnArray('avg_agreed_note')
-avgnote_no0 = JCR.getColumnArray('avg_agreed_note', filterfunc=lambda x:True if x>0.0 else False)
-avgnote_0 = len(JCR.getColumnArray('avg_agreed_note', filterfunc=lambda x:True if x==0.0 else False))
+avgnote = JCR.getColumnArray('weighted_avg_agreed_note')
+avgnote_no0 = JCR.getColumnArray('weighted_avg_agreed_note', filterfunc=lambda x:True if x>0.0 else False)
+avgnote_0 = len(JCR.getColumnArray('weighted_avg_agreed_note', filterfunc=lambda x:True if x==0.0 else False))
 
 
 plt.subplot(212)

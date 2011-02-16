@@ -1,129 +1,99 @@
-from numpy import fromiter
+import numpy as np
 import csv
 from warnings import warn
 from defaultplotdict import DefaulPlotDict
-from os import getcwd
-
-#if you edit this variable for example replacing an old file with your new file, be careful in maintaining the order of the list:
-# first in the list is for week, second for month, third for total 
-filesdict = dict(album=["stats_album_week.csv", "stats_album_month.csv", "stats_album_total.csv"],\
-                 track=["stats_track_week.csv", "stats_track_month.csv", "stats_track_total.csv"],\
-                 artist=["stats_artist_week.csv", "stats_artist_month.csv", "stats_artist_total.csv"])
+from JamendoDataReader import JamendoDataReader
 
 
-class JamendoCsvReader(object):
+
+filesdict = dict(album=dict(week="stats_album_week.csv", month="stats_album_month.csv", total="stats_album_total.csv"), \
+                 track=dict(week="stats_track_week.csv", month="stats_track_month.csv", total="stats_track_total.csv"), \
+                 artist=dict(week="stats_artist_week.csv", month="stats_artist_month.csv", total="stats_artist_total.csv"))
+
+defaultfiles = reduce(lambda x,y:x+y, [e.values() for e in filesdict.values()])
+availableunits = filesdict.keys()
+csvdirectory = 'CSV'
+
+
+
+
+class JamendoCsvReader(JamendoDataReader):
     
-    def __init__(self, file):
+    def __init__(self, file, path='default'):
         
         self.file = file
                 
-        #album track or artist?
+        #album track or artist? week, month or total?
+        self.unit, self.period = False, False
         for key in filesdict.keys():
-            if file in filesdict[key]: self.unit = key
-                    
-                    
-        #take the file
-        try: csvreader = csv.DictReader(open('CSV/'+self.file), delimiter=';', quotechar='"')
-        except: 
-            try: csvreader = csv.DictReader(open('../CSV/'+self.file), delimiter=';', quotechar='"')
-            except Exception, e: raise e
-            
-        self.colnames = False       
+            if file in filesdict[key].values(): 
+                self.unit = key                
+                for pair in filesdict[key].items(): 
+                    if pair[1]==file: self.period= pair[0] 
+        if not self.unit or not self.period: 
+            warn("unit and/or period not found for %s !!! check filesdict (JamendoCsvReader module)" % self.file)
         
+
+        #take the file
+        if path != 'default': openedfile = open(path+self.file)            
+        else: 
+            try: openedfile = open(csvdirectory+'/'+self.file)
+            except: 
+                try: openedfile = open('../'+csvdirectory+'/'+self.file)
+                except Exception, e: raise e        
+        csvreader = csv.DictReader(openedfile, delimiter=';', quotechar='"') 
+
+        
+        self.colnames = False       
+        l = 0
         #load data in the a cahe dictionary indexed on IDs
         self._row_dict_cache=dict()
-        a = 0             
-        for row in csvreader:
-            a+=1  
+        for row in csvreader:  
             #in the first iteration columns store the columns name
-            if not self.colnames: self.colnames = row.keys()  
+            if not self.colnames: 
+                self.colnames = row.keys()
+                assert 'id' in self.colnames, ' an id column is mandatory'
             for key,val in row.items():
                 #casting of the values on this row
                 try: 
-                    row[key]=float(val)                    
+                    if key=='id': row[key]=int(val)
+                    else: row[key]=float(val)                    
                 except ValueError: 
                     pass #this val is a string
                 
             if self._row_dict_cache.has_key(row['id']): raise Exception('duplicated key: '+ str(row['id']))   
-            self._row_dict_cache[row['id']]=row             
+            self._row_dict_cache[row['id']]=row
+            
+            l +=1
+        
+        self.len = l                
+        self._col_dict_cache=dict()         
+        openedfile.close()
 
             
-            
     def iterRow(self):
-        """Iter on all rows. Each row is in the form of a dict {field1:this_row_val_of_field1, field2:this_row_val_of_field2, ...} and is indexed in a cache
-        (self._row_dict_cache) by id. iterRow, yield value using this cache.values()"""
+        """Iter on all rows. Each row is in the form of a dict {field1:this_row_val_of_field1, field2:this_row_val_of_field2, ...} 
+        and is indexed in a cache (self._row_dict_cache) by id. iterRow, yield value using this cache.values()"""
          
         for element in self._row_dict_cache.values():
             yield element
 
-
-    def iterRowSelectingColumns(self, colnames, filterfunc=lambda y:True): 
-        """used from self.getColumns, just wrap self.iterRow(), selecting only the columns passed in the parameter colnames (type: list)"""
+                
         
-        for row in self.iterRow():  
-            if filterfunc(row):
-                yield dict( [[colname,row[colname]] for colname in colnames] )   
-                #{'rating': 0.73730200000000001, 'reviews_avgnote': 0.71603099999999997, ...}
-                #{'rating': 0.69415400000000005, 'reviews_avgnote': 0.66761899999999996, ...}
-                #...                                              
-    
-    def iterColumnValues(self, colname, filterfunc=lambda y:True):
-        """Iter yielding values belonged to a given column (the one with the name colname), eventually filtering 
-        it (see core.utils). Return only the values, not value with key as iterRow and iterRowSelectingColumns"""
-        
-        if colname not in self.colnames: raise KeyError('colname '+str(colname)+' is not a valid column name. choose from '+str(self.colnames))
-
-        for row in self.iterRow():
-            if filterfunc(row[colname]):
-                yield row[colname]
-            
-            
-    def getColumnArray(self, colname, filterfunc=lambda y:True, reverse=None, type='default'):
-        """Using iterColumnValues, takes the colname of a column and return this column in the form of 
-        numpy.array, eventually filtering and sorting it"""
-        
-        if type=='default': 
-            try: type=DefaulPlotDict[colname]['type']
-            except: type=float
-                    
-        if reverse is None:
-            a = self.iterColumnValues(colname, filterfunc)
-            return fromiter(a, type)
-        return fromiter(sorted(self.iterColumnValues(colname, filterfunc), reverse=reverse), type)
-    
-    
-    
-    def getColumns(self, colnames, filterfunc=lambda y:True, sortkey=None, reverse=True, castreturntype=list):
-        """ Takes the list colnames and returns a dictofcolumns containing all the columns in form of a list (indexed on 
-        dictofcolumns by its column name). Every list, even if sorted and/or filtered, will be aligned to the others.\n
-        You can also get an iter or array return type simply using the key arg castreturntype (set it with the desidered cast function)...\n
-        For filterfunc key arg, see utils.filterfieldsunder """
-           
-        if sortkey is None: selectedcolumnsiter = self.iterRowSelectingColumns(colnames, filterfunc)
-        else: selectedcolumnsiter = sorted(self.iterRowSelectingColumns(colnames, filterfunc), key=lambda x:x[sortkey], reverse=reverse)
-
-        dictofcolumns=dict( [[colname,list()] for colname in colnames] )                    
-        for row in selectedcolumnsiter: 
-            for key in row.keys():
-                dictofcolumns[key].append(row[key])
-                   
-        if castreturntype is not type(list()):
-            try:
-                for field in dictofcolumns.keys():
-                    dictofcolumns[field] = castreturntype(dictofcolumns[field])
-            except Exception:
-                print 'castreturntype key arg has to be a "from list" cast function as numpy.array or iter'
-                raise e
-             
-        return dictofcolumns #{'rating': <listiterator object at 0x1aac0d0>, 'reviews_avgnote': <listiterator object at 0x1aaec10>, ...}
-
+    def getRowById(self, id):
+        if len(self._row_dict_cache)==0: 
+            for row in self.iterRow():
+                if row['id']==id:
+                    return row 
+                    break
+        else: return self._row_dict_cache[id]
        
     
-    def iterColumnValuesJoinOnPeriods(self, colname):
+    def iterColumnValuesJoinOnPeriods(self, colname): #never tested!!
         """Iter aligning the values belonged to different period stats, but the same unit and column. 
         The map between files is done using the filesdict"""
         
-        (Week, Month, Total) = [self if file==self.file else JamendoCsvReader(file) for file in filesdict[self.unit] ]
+        (Month, Total, Week) = [self if file==self.file else JamendoCsvReader(file) for file in sorted(filesdict[self.unit].values()) ]
                      
         weekids, monthids, totalids = set(Week.iterColumnValues('id')), set(Month.iterColumnValues('id')), set(Total.iterColumnValues('id'))
     
@@ -153,17 +123,6 @@ class JamendoCsvReader(object):
         return dictofcolumns #{week:[234, 21, ...], month:[123, 3,...], total:[3,43,...]}
 
 
-
-    def getRowById(self, id):
-        if len(self._row_dict_cache)==0: 
-            for row in self.iterRow():
-                if row['id']==id:
-                    return row 
-                    break
-        else: return self._row_dict_cache[id]
-    
-     
-     
         
         
         
@@ -172,32 +131,40 @@ class JamendoCsvReader_artist(JamendoCsvReader):
 
     def __init__(self, *args):
         JamendoCsvReader.__init__(self, *args)
-        assert self.file in filesdict['artist'], '%s is not an available artist file! To add a new, change variables JamendoCsvReader.filesdict' % self.file
+        assert self.file in filesdict['artist'].values(), '%s is not an available artist file! To add a new, change variables JamendoCsvReader.filesdict' % self.file
         
-        self.relatedalbumfile = filesdict['album'][filesdict['artist'].index(self.file)]
-        self.RelatedAlbums = JamendoCsvReader_album( self.relatedalbumfile, False )
-      
+        self.relatedalbumfile = filesdict['album'][self.period]
+        self._RelatedAlbums = False
+
+    def _getRelatedAlbums(self):
+        if not self._RelatedAlbums:
+            print '_RelatedAlbums'
+            self._RelatedAlbums = JamendoCsvReader_album( self.relatedalbumfile, False )
+        return self._RelatedAlbums
+
+    RelatedAlbums = property(_getRelatedAlbums, None, None, "")
       
         
              
         
 class JamendoCsvReader_album(JamendoCsvReader):
 
-    def __init__(self, file, relatedartists=True):
-        JamendoCsvReader.__init__(self, file)
-        assert self.file in filesdict['album'], '%s is not an available album file! To add a new, change variables JamendoCsvReader.filesdict' % self.file
+    def __init__(self, *args):
+        JamendoCsvReader.__init__(self, *args)
+        assert self.file in filesdict['album'].values(), '%s is not an available album file! To add a new, change variables JamendoCsvReader.filesdict' % self.file
         
-        self.relatedtrackfile = filesdict['track'][filesdict['album'].index(self.file)]
-        self.RelatedTracks = JamendoCsvReader_track( self.relatedtrackfile, False )
+        self.relatedtrackfile = filesdict['track'][self.period]
+        self._RelatedTracks = False
 
+        self.relatedartists = filesdict['artist'][self.period]
+        self._RelatedArtists = False            
+
+        
         self.artists_cached=False
         self._row_artistid_dict_cache = dict()
-
-        if relatedartists:
-            self.relatedartists = filesdict['album'][filesdict['track'].index(self.file)]
-            self.RelatedArtists = JamendoCsvReader( self.self.relatedartists )            
              
     def iterAlbumJoinArtist(self, artistid):
+        """will be used by JamendoCsvReader_artist"""
         
         if not self.artists_cached:
             
@@ -219,26 +186,40 @@ class JamendoCsvReader_album(JamendoCsvReader):
             except:  
                 #warn(' *** no tracks for album %s' % artistid)
                 pass
-      
+        
+    def _getRelatedTracks(self):
+        if not self._RelatedTracks:
+            print '_getRelatedTRacks'
+            self._RelatedTracks = JamendoCsvReader_track( self.relatedtrackfile )
+        return self._RelatedTracks 
+
+    def _getRelatedArtists(self):
+        if not self._RelatedArtists:
+            print '_getRelatedArtists'
+            self._RelatedArtists = JamendoCsvReader( self.relatedartists )
+        return self._RelatedArtists
+
+    RelatedTracks = property(_getRelatedTracks, None, None, "")
+    RelatedArtists = property(_getRelatedArtists, None, None, "")
             
     
     
     
 class JamendoCsvReader_track(JamendoCsvReader):
     
-    def __init__(self, file, relatedalbums=True):
-        JamendoCsvReader.__init__(self, file)
-        assert self.file in filesdict['track'], '%s is not an available track file! To add a new, change variables JamendoCsvReader.filesdict' % self.file
+    def __init__(self, *args):
+        JamendoCsvReader.__init__(self, *args)
+        assert self.file in filesdict['track'].values(), '%s is not an available track file! To add a new, change variables JamendoCsvReader.filesdict' % self.file
+                
+        self.relatedalbums = filesdict['album'][self.period]
+        self._RelatedAlbums = False
+        
         
         self.tracks_cached = False
-        self._row_albumid_dict_cache = dict()
-
-        if relatedalbums: 
-            self.relatedalbums = filesdict['album'][filesdict['track'].index(self.file)]
-            self.RelatedAlbums = JamendoCsvReader( self.relatedalbums )
-            
+        self._row_albumid_dict_cache = dict()    
              
     def iterTrackJoinAlbum(self, albumid):
+        """will be used by JamendoCsvReader_album"""
         
         if not self.tracks_cached:
             
@@ -261,6 +242,13 @@ class JamendoCsvReader_track(JamendoCsvReader):
                 #warn(' *** no tracks for album %s' % albumid)
                 pass
 
+    def _getRelatedAlbums(self):
+        if not self._RelatedAlbums:
+            print '_RelatedAlbums'
+            self._RelatedAlbums = JamendoCsvReader( self.relatedalbums )
+        return self._RelatedAlbums
+
+    RelatedAlbums = property(_getRelatedAlbums, None, None, "")
 
 
 

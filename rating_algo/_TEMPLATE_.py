@@ -1,19 +1,36 @@
-from core import JamendoCsvReader #you can directly import from core thanks for the command sys.path.append('../') in this directory __init__py  
+from sys import path
+path.append('../') #needed for launch this script for test (see func test) directly from command line
+
+from core.JamendoCsvReader import *   
+import numpy as np
+from core.utils import nomramlizeTo0_1, getRanks
+# .....
 
 
 
-
-def _TEMPLATE_(file):  #The name of the main function MUST BE THE SAME OF THE FILE that contain it. test_alog.py will call it with the used file as argument
-      
-    JCR = JamendoCsvReader.JamendoCsvReader(file)
+def _TEMPLATE_(JCR, period, istest=False): #the main function must have the same name of the file!
     
-    for row in JCR.iterRow():
+    #JCR must be a JamendoDataReader object
+    #period: currently we are considering only week, month and year
+    #istest=False leave this keyarg always as this one
+ 
+    COLUMNS = JCR.getColumns(cols)
 
-        #.... do some operations ...
-        #.... do some operations ...
-        #.... do some operations ...
+    if istest:
+        pass 
+        #what yu want to return for test
+                
+    else:
+        #this format is mandatory 
+        return {'id': COLUMNS['id'], 'rate': rate}
+    
         
-        yield absolute_rate_calculated_for_this_row #you can yield absolute value... test:algo.py will provide to normalize them in the range(0,1)
-  
-  
 
+def test(file, period=''):
+
+    pass
+
+#test('stats_album_week.csv')
+        
+        
+        

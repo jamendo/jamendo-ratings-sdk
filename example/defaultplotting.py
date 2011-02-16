@@ -3,7 +3,6 @@ path.append('../core')
 
 from JamendoPlotFuncs import defaultPlotting
 from JamendoCsvReader import JamendoCsvReader
-from JamendoStatAnalyser import JamendoStatAnalyser
 import matplotlib.pyplot as plt
 import numpy as np
 from utils import filterunder, filteroutofinterval #sorting functions
@@ -24,9 +23,8 @@ defaultPlotting(JCR, 'downloads_all', filterunder(10000), title='items with more
 
 
 #calulate playlisted mean, and the plot filtering values under this mean
-JSA = JamendoStatAnalyser(JCR)
-mean = JSA.funcOnColumn('playlisted', np.mean)
-std = JSA.funcOnColumn('playlisted', np.std)
+mean = np.mean(JCR.getColumnArray('playlisted'))
+std = np.std(JCR.getColumnArray('playlisted'))
 defaultPlotting(JCR, 'playlisted', filterunder(mean), show=False)
 
 defaultPlotting(JCR, 'playlisted', filteroutofinterval(mean-std, mean+std), \

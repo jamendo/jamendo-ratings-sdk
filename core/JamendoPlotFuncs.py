@@ -5,14 +5,24 @@ from JamendoCsvReader import *
 from utils import filterunder
 from defaultplotdict import DefaulPlotDict
 from itertools import starmap
-from JamendoStatAnalyser import JamendoStatAnalyser
 
 
 allperiods = ['week', 'month', 'total']
-allunits = ['artist', 'album', 'track']
+allunits = availableunits
 
 
-#****** FUNCTION FOR PLOT GRAPHS RELATED TO ONE JamendoCsvReader******
+def nomramlizeTo0_1(col):
+    m, M = min(col), max(col)    
+    normalizedcol = [(v-m)/float((M-m)) for v in col]    
+    
+    return normalizedcol
+
+
+def getMovingAvg(col, moving_avg_period=10):
+    return reduce(lambda x,y:x+y, [moving_avg_period*[average(col[j:j+moving_avg_period])] for j in range(0,len(col), moving_avg_period)])
+
+
+#****** FUNCTION FOR PLOT GRAPHS RELATED TO A JamendoCsvReader******
 def defaultPlotting(JamendoCsvReader, colname, filterfunc=lambda y:True, title=None, ylabel=None, xlabel=None, reverse=None, semilog=None, show=True):
 
     if title is None: title = DefaulPlotDict[colname]['title']
@@ -29,14 +39,6 @@ def defaultPlotting(JamendoCsvReader, colname, filterfunc=lambda y:True, title=N
     if show: plt.show()
 
 
-def nomramlizeTo0_1(col):
-    
-    m, M = min(col), max(col)    
-    normalizedcol = [(v-m)/float((M-m)) for v in col]    
-    
-    return normalizedcol
-
-#****** FUNCTION FOR PLOT GRAPHS RELATED TO ONE JamendoCsvReader******
 def compareJCRColumns(JamendoCsvReader, fields, sortkey=None, filterfunc=lambda x:True, normalize=False, reverse=True, semilog=False,\
             plotlines = ['b-','g-','r-', 'c-', 'm-', 'y-', 'k-'], title='default', show=True):
     
@@ -46,9 +48,12 @@ def compareJCRColumns(JamendoCsvReader, fields, sortkey=None, filterfunc=lambda 
         
     JC = JamendoCsvReader.getColumns(fields, sortkey=sortkey, filterfunc=filterfunc, reverse=reverse)
     
+    #field appear as last avoiding the risk to be hidden
+    if sortkey!=None: fields = [f for f in fields if f != sortkey] + [sortkey]
+    
     args = list()
     i=0
-    for field in fields:
+    for field in fields: 
         args.append(nomramlizeTo0_1(JC[field])) if normalize else args.append(JC[field])
         args.append(plotlines[i])
         i+=1
@@ -67,18 +72,17 @@ def compareJCRColumns(JamendoCsvReader, fields, sortkey=None, filterfunc=lambda 
 
 
 #****** FUNCTION FOR PLOT GRAPHS RELATED TO ONE JamendoCsvReader******
-def plot_rating_stats(JamendoCsvReader, field='rating', type=float, title='', show=True, nozero=False):
+def plot_rating_stats(JamendoCsvReader, field='rating', castfunc=float, title='', show=True, nozero=False):
     """This function is thought to be used for plotting rating statistical informations and graphs, 
     but may b used with other fields..."""
     
     f = lambda x: x != 0 if nozero else lambda x:True
     
-    rating = JamendoCsvReader.getColumnArray(field, reverse=True, type=type, filterfunc=f)   
+    rating = JamendoCsvReader.getColumnArray(field, reverse=True, castfunc=castfunc, filterfunc=f)   
         
-    JSA = JamendoStatAnalyser(JamendoCsvReader)
-    columnmean = JSA.funcOnColumn(field, mean)
-    columnmedian = JSA.funcOnColumn(field, median)
-    columnstd = JSA.funcOnColumn(field, std)
+    columnmean = mean(rating)
+    columnmedian = median(rating)
+    columnstd = std(rating)
     
     onesvect = ones(len(rating))
     
@@ -144,7 +148,7 @@ def compareUnitsOn1Period(field, period, funconjoined=mean, title='', show=True)
     plt.plot(results['track'], 'b-', results['album'], 'g-')
     plt.plot(results['artist'], 'r-', linewidth=2)
     
-    legend = [unit+'_'+period+' '+field for unit in ['track', 'album', 'artist']]  
+    legend = [unit+'_'+period+' '+field for unit in allunits]  
     plt.legend(legend, loc='best', prop={'size':10})
     plt.title(title)   
     if show: plt.show() 
