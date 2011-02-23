@@ -54,6 +54,7 @@ class JamendoCsvReader(JamendoDataReader):
                 self.colnames = row.keys()
                 assert 'id' in self.colnames, ' an id column is mandatory'
             for key,val in row.items():
+                
                 #casting of the values on this row
                 try: 
                     if key=='id': row[key]=int(val)
@@ -66,8 +67,7 @@ class JamendoCsvReader(JamendoDataReader):
             
             l +=1
         
-        self.len = l                
-        self._col_dict_cache=dict()         
+        self.len = l                         
         openedfile.close()
 
             

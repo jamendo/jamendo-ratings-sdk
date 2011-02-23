@@ -46,5 +46,6 @@ DefaulPlotDict = {
                    "id": setColumnDict(int),
                    "artistid": setColumnDict(int),
                    "albumid": setColumnDict(int),
-                   "license_music": setColumnDict(str, title='url of the license used by this album')
+                   "license_url": setColumnDict(str, title='url of the license used by this album or track'),
+                   "license_class": setColumnDict(str, title='main type of the license used by this album or track')
                    }

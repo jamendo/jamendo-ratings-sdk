@@ -28,7 +28,11 @@ def filteroutofinterval(sx,dx):
 def nomramlizeTo0_1(col):
     """func to normalize a column i the range of 0,1"""
     ones = np.ones(len(col))
-    m, M = float(min(col)), float(max(col))    
+    m, M = float(min(col)), float(max(col))
+    
+    if m == 0 and M ==0:
+        print 'WARNING: trying to normalize a column with all 0 values'
+        return col
     normalizedcol = np.true_divide((col - ones*m), ones*(M-m))    
     
     return normalizedcol

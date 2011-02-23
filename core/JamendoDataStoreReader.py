@@ -24,7 +24,6 @@ class JamendoDataStoreReader(JamendoDataReader):
                 self.colnames.remove(field)        
         self.colnames += ['id']
                 
-        self._col_dict_cache=dict()
         self._row_dict_cache=dict() #will be fill on a getRowById call. Unless such a case would cause other memory consuming without any reason
         
                             
